@@ -15,12 +15,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "ImprovedAudioRecorder";
     protected static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     protected boolean permissionToRecordAccepted = false;
     protected String [] permissions = {android.Manifest.permission.RECORD_AUDIO};
+    protected ArrayList<String> recordings = new ArrayList<String>();
 
 
     public String mFileName = null;
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         //CREATE BLOCK THAT LOOKS FOR PRECREATED FILES AND SETS PLAY ENABLED IF THERE ARE SOME
 
        final EditText recordingNameField = (EditText)findViewById(R.id.recordingNameField);
-
+        pauseButton.setEnabled(true);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,10 +84,15 @@ public class MainActivity extends AppCompatActivity {
                 if(startRecording) {
                     recordButton.setText("Stop Recording");
                     playButton.setEnabled(false);
+                    recordingNameField.setEnabled(false);
                 }
                 else {
                     recordButton.setText("Start Recording");
                     playButton.setEnabled(true);
+                    recordingNameField.setEnabled(true);
+                    //SAVE FILE, ADD TO LIST
+                    recordings.add(mFileName);
+                    recordingNameField.getText().clear();
                 }
                 startRecording = !startRecording;
             }
@@ -94,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                onpause();
                 if(paused)
                     pauseButton.setText("Paused");
                 else
@@ -114,6 +122,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+    private void onpause(){
+        for(int i = 0; i < recordings.size(); i++){
+            Toast.makeText(this, recordings.get(i), Toast.LENGTH_SHORT).show();
+        }
     }
     private void onRecord(boolean start){
         if(start)
