@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -22,10 +23,12 @@ public class MainActivity extends AppCompatActivity {
     protected static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     protected boolean permissionToRecordAccepted = false;
     protected String [] permissions = {android.Manifest.permission.RECORD_AUDIO};
-    protected ArrayList<String> recordings = new ArrayList<String>();
+    protected ArrayList<recording> recordings = new ArrayList<recording>();
+    recordingAdapter adapter = null;
 
 
     public String mFileName = null;
+    public String userInput = null;
     boolean startPlaying = true;
     boolean startRecording = true;
     boolean paused = true;
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         final AppCompatButton recordButton = (AppCompatButton) findViewById(R.id.xml_record_button);
         final AppCompatButton pauseButton = (AppCompatButton) findViewById(R.id.xml_pause_button);
         final Button enterButton = findViewById(R.id.enter_button);
+        final ListView listView = findViewById(R.id.recording_container);
 
         //CREATE BLOCK THAT LOOKS FOR PRECREATED FILES AND SETS PLAY ENABLED IF THERE ARE SOME
 
@@ -91,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
                     playButton.setEnabled(true);
                     recordingNameField.setEnabled(true);
                     //SAVE FILE, ADD TO LIST
-                    recordings.add(mFileName);
+                    recordings.add(new recording(mFileName, userInput));
+                    adapter.notifyDataSetChanged();
                     recordingNameField.getText().clear();
                 }
                 startRecording = !startRecording;
@@ -113,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         enterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String userInput = recordingNameField.getText().toString();
+                userInput = recordingNameField.getText().toString();
                 mFileName = getExternalCacheDir().getAbsolutePath() + '/' + userInput + ".3gp";
                 Toast.makeText(MainActivity.this, mFileName, Toast.LENGTH_SHORT).show();
                 file_name_entered = true;
@@ -121,11 +126,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        adapter = new recordingAdapter(this, recordings);
+        listView.setAdapter(adapter);
 
     }
     private void onpause(){
         for(int i = 0; i < recordings.size(); i++){
-            Toast.makeText(this, recordings.get(i), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, recordings.get(i).getShortFileName(), Toast.LENGTH_SHORT).show();
         }
     }
     private void onRecord(boolean start){
