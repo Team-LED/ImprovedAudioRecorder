@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.android.improvedaudiorecorder.MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/textInputContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp">
+
+        <EditText
+            android:id="@+id/recordingNameField"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@id/enter_button"
+            android:layout_marginRight="8dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+            android:hint="Recording Name" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/enter_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/recordingNameField"
+            android:layout_marginLeft="8dp"
+            android:text="Enter"
+            android:layout_alignParentRight="true"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:onClick="createFileName"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textInputContainer"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="8dp"
+        android:gravity="center_horizontal">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/xml_record_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:text="Start Recording"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:enabled="false"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/xml_play_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toRightOf="@id/xml_record_button"
+            android:text="Start Playback"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:enabled="false"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/xml_pause_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toRightOf="@id/xml_play_button"
+            android:text="Pause"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:enabled="false"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/recording_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_below="@id/buttonContainer">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="test" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="test" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="test" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="test" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="test" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="test" />
+        </LinearLayout>
+
+
+    </ScrollView>
+
+</RelativeLayout>
