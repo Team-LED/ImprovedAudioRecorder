@@ -1,6 +1,7 @@
 package com.example.android.improvedaudiorecorder;
 
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.support.annotation.NonNull;
@@ -10,13 +11,22 @@ import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+//TODO: 1. Have play button change when file is over
+//      2. Deload resources when playback ends
+//      3. Figure out how to create some file permanency
+//      4. Decide how to handle multiple files with the same name(Overwrite? Not Allow?)
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "ImprovedAudioRecorder";
@@ -92,12 +102,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     recordButton.setText("Start Recording");
-                    playButton.setEnabled(true);
                     recordingNameField.setEnabled(true);
                     //SAVE FILE, ADD TO LIST
                     recordings.add(new recording(mFileName, userInput));
                     adapter.notifyDataSetChanged();
                     recordingNameField.getText().clear();
+                    recordButton.setEnabled(false);
+                    mFileName = null;
                 }
                 startRecording = !startRecording;
             }
@@ -128,6 +139,28 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new recordingAdapter(this, recordings);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                recording listItem = (recording) listView.getItemAtPosition(position);
+                for (int i = 0; i < listView.getChildCount(); i++) {
+                    if (position == i) {
+                        View temp = listView.getChildAt(i);
+                        TextView txtView = ((TextView)temp.findViewById(R.id.item_name));
+                        txtView.setTextColor(getResources().getColor(R.color.colorAccent));
+
+                    }
+                    else{
+                        View temp = listView.getChildAt(i);
+                        TextView txtView = ((TextView)temp.findViewById(R.id.item_name));
+                        txtView.setTextColor(Color.BLACK);
+                    }
+
+                }
+                mFileName = listItem.getFullFileName();
+                playButton.setEnabled(true);
+            }
+        });
 
     }
     private void onpause(){

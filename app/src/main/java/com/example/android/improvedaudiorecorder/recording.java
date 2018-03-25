@@ -1,5 +1,7 @@
 package com.example.android.improvedaudiorecorder;
 
+import android.widget.TextView;
+
 /**
  * Created by lizzi on 3/24/2018.
  */
@@ -15,4 +17,5 @@ public class recording {
 
     public String getFullFileName(){return full_file_name;}
     public String getShortFileName(){ return short_file_name;}
+
 }
