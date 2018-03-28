@@ -1,6 +1,4 @@
-package com.example.android.improvedaudiorecorder;
-
-import android.widget.TextView;
+package com.example.android.improvedaudiorecorder.model;
 
 /**
  * Created by lizzi on 3/24/2018.
@@ -8,14 +6,14 @@ import android.widget.TextView;
 
 public class recording {
     private String full_file_name;
-    private String short_file_name;
+    private String recording_title;
 
     public recording(String f, String s){
         full_file_name = f;
-        short_file_name = s;
+        recording_title = s;
     }
 
     public String getFullFileName(){return full_file_name;}
-    public String getShortFileName(){ return short_file_name;}
+    public String getRecordingTitle(){ return recording_title;}
 
 }

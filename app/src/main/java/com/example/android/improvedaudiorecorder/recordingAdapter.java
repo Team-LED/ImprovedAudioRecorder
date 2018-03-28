@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.android.improvedaudiorecorder.model.recording;
+
 import java.util.ArrayList;
 
 /**
@@ -32,7 +34,7 @@ public class recordingAdapter extends ArrayAdapter<recording> {
         recording currentRecording = getItem(position);
 
         TextView fileNameTextView = listItemView.findViewById(R.id.item_name);
-        fileNameTextView.setText(currentRecording.getShortFileName());
+        fileNameTextView.setText(currentRecording.getRecordingTitle());
 
         return listItemView;
     }

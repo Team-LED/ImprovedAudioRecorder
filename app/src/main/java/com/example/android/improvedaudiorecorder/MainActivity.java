@@ -18,7 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import com.example.android.improvedaudiorecorder.model.recording;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityCompat.requestPermissions(this, permissions,REQUEST_RECORD_AUDIO_PERMISSION);
         setContentView(R.layout.activity_main);
+
+        Toast.makeText(this, "Create", Toast.LENGTH_SHORT).show();
+
         final AppCompatButton playButton = (AppCompatButton)findViewById(R.id.xml_play_button);
         final AppCompatButton recordButton = (AppCompatButton) findViewById(R.id.xml_record_button);
         final AppCompatButton pauseButton = (AppCompatButton) findViewById(R.id.xml_pause_button);
@@ -163,9 +166,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
+    }
+
     private void onpause(){
         for(int i = 0; i < recordings.size(); i++){
-            Toast.makeText(this, recordings.get(i).getShortFileName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, recordings.get(i).getRecordingTitle(), Toast.LENGTH_SHORT).show();
         }
     }
     private void onRecord(boolean start){
@@ -177,11 +187,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void startRecording(){
         recorder = new MediaRecorder();
+
+        //It might be best to put this whole thing inside a try/catch
+        //block? I'm not sure.
+
         //Sets up the recorder for audio as opposed to video,
         //and a few other things related to file format and encoding.
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+
+        //I think here is where I need to add the internal storage
+        //directory as an argument
         recorder.setOutputFile(mFileName);
+
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         //Does some final magic to get the recorder ready.
         try {
