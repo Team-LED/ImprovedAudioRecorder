@@ -1,5 +1,6 @@
 package com.example.android.improvedaudiorecorder;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.android.improvedaudiorecorder.model.recording;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -36,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     protected ArrayList<recording> recordings = new ArrayList<recording>();
     recordingAdapter adapter = null;
 
+    //3-28-18
+    File directory = null;
+    File Recordings_Contents[] = null;
 
     public String mFileName = null;
     public String userInput = null;
@@ -66,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, permissions,REQUEST_RECORD_AUDIO_PERMISSION);
         setContentView(R.layout.activity_main);
 
-        Toast.makeText(this, "Create", Toast.LENGTH_SHORT).show();
+        //3-28-18
+        //switch to MODE_PRIVATE
+        directory = this.getDir("Recordings", MODE_PRIVATE);
+        Recordings_Contents = directory.listFiles();
+        //Toast.makeText(this, directory.toString(), Toast.LENGTH_SHORT).show();
 
         final AppCompatButton playButton = (AppCompatButton)findViewById(R.id.xml_play_button);
         final AppCompatButton recordButton = (AppCompatButton) findViewById(R.id.xml_record_button);
@@ -75,7 +84,9 @@ public class MainActivity extends AppCompatActivity {
         final ListView listView = findViewById(R.id.recording_container);
 
         //CREATE BLOCK THAT LOOKS FOR PRECREATED FILES AND SETS PLAY ENABLED IF THERE ARE SOME
-
+        for(int i = 0; i < Recordings_Contents.length; i++){
+            recordings.add(new recording(Recordings_Contents[i].toString(), Recordings_Contents[i].toString()));
+        }
        final EditText recordingNameField = (EditText)findViewById(R.id.recordingNameField);
         pauseButton.setEnabled(true);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -133,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 userInput = recordingNameField.getText().toString();
-                mFileName = getExternalCacheDir().getAbsolutePath() + '/' + userInput + ".3gp";
-                Toast.makeText(MainActivity.this, mFileName, Toast.LENGTH_SHORT).show();
+                mFileName = directory.toString() + '/' + userInput + ".3gp";
+                //Toast.makeText(MainActivity.this, mFileName, Toast.LENGTH_SHORT).show();
                 file_name_entered = true;
                 recordButton.setEnabled(true);
             }
@@ -170,12 +181,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
     }
 
     private void onpause(){
-        for(int i = 0; i < recordings.size(); i++){
-            Toast.makeText(this, recordings.get(i).getRecordingTitle(), Toast.LENGTH_SHORT).show();
+        for(int i = 0; i < Recordings_Contents.length; i++){
+            Toast.makeText(this, Recordings_Contents[i].toString(), Toast.LENGTH_SHORT).show();
         }
     }
     private void onRecord(boolean start){
@@ -212,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopRecording(){
+        Recordings_Contents = directory.listFiles();
         recorder.stop();
         recorder.release();
         recorder = null;
