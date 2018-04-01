@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
         android:id="@+id/item_name"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="3"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
         android:paddingVertical="16dp"
         android:paddingHorizontal="16dp"
+        android:maxLines="2"
+        android:ellipsize="end"
         android:text="Sample Name"/>
+    <TextView
+        android:id="@+id/get_details_view"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="details"
+        android:paddingTop="8dp"
+        android:paddingVertical="16dp"
+        android:paddingHorizontal="8dp"
+        android:textAllCaps="true"/>
+
+    <TextView
+        android:id="@+id/delete_view"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="delete"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingVertical="16dp"
+        android:paddingHorizontal="8dp"
+        android:textAllCaps="true"/>
 
 </LinearLayout>

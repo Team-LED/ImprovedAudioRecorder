@@ -5,8 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.improvedaudiorecorder.model.recording;
+
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -14,6 +18,8 @@ import java.util.ArrayList;
  */
 
 public class recordingAdapter extends ArrayAdapter<recording> {
+
+    protected ListView listView;
 
     public recordingAdapter(Activity context, ArrayList<recording> recordingList){
         super(context, 0, recordingList);
@@ -29,11 +35,24 @@ public class recordingAdapter extends ArrayAdapter<recording> {
 
         }
 
-        recording currentRecording = getItem(position);
+        final recording currentRecording = getItem(position);
 
         TextView fileNameTextView = listItemView.findViewById(R.id.item_name);
-        fileNameTextView.setText(currentRecording.getShortFileName());
+        fileNameTextView.setText(currentRecording.getRecordingTitle());
+
+        TextView deleteTextView = listItemView.findViewById(R.id.delete_view);
+        deleteTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String fileToDelete = currentRecording.getFullFileName();
+                File file = new File(fileToDelete);
+                boolean deleted = file.delete();
+                MainActivity.refreshContents();
+                remove(currentRecording);
+            }
+        });
 
         return listItemView;
     }
+
 }

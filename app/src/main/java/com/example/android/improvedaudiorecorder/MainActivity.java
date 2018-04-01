@@ -1,5 +1,6 @@
 package com.example.android.improvedaudiorecorder;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -18,14 +19,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import com.example.android.improvedaudiorecorder.model.recording;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-//TODO: 1. Have play button change when file is over
+//TODO: 1. Check user input before file creation to see if name is already in use.
 //      2. Deload resources when playback ends
-//      3. Figure out how to create some file permanency
 //      4. Decide how to handle multiple files with the same name(Overwrite? Not Allow?)
 
 public class MainActivity extends AppCompatActivity {
@@ -34,11 +35,15 @@ public class MainActivity extends AppCompatActivity {
     protected boolean permissionToRecordAccepted = false;
     protected String [] permissions = {android.Manifest.permission.RECORD_AUDIO};
     protected ArrayList<recording> recordings = new ArrayList<recording>();
-    recordingAdapter adapter = null;
+    protected static recordingAdapter adapter = null;
 
+    //3-28-18
+    protected static File directory = null;
+    protected static File Recordings_Contents[] = null;
 
     public String mFileName = null;
     public String userInput = null;
+    boolean readyToRecord = false;
     boolean startPlaying = true;
     boolean startRecording = true;
     boolean paused = true;
@@ -65,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityCompat.requestPermissions(this, permissions,REQUEST_RECORD_AUDIO_PERMISSION);
         setContentView(R.layout.activity_main);
+
+        //3-28-18
+        //switch to MODE_PRIVATE
+        directory = this.getDir("Recordings", MODE_PRIVATE);
+        Recordings_Contents = directory.listFiles();
+        //Toast.makeText(this, directory.toString(), Toast.LENGTH_SHORT).show();
+
         final AppCompatButton playButton = (AppCompatButton)findViewById(R.id.xml_play_button);
         final AppCompatButton recordButton = (AppCompatButton) findViewById(R.id.xml_record_button);
         final AppCompatButton pauseButton = (AppCompatButton) findViewById(R.id.xml_pause_button);
@@ -72,7 +84,9 @@ public class MainActivity extends AppCompatActivity {
         final ListView listView = findViewById(R.id.recording_container);
 
         //CREATE BLOCK THAT LOOKS FOR PRECREATED FILES AND SETS PLAY ENABLED IF THERE ARE SOME
-
+        for(int i = 0; i < Recordings_Contents.length; i++){
+            recordings.add(new recording(Recordings_Contents[i].toString()));
+        }
        final EditText recordingNameField = (EditText)findViewById(R.id.recordingNameField);
         pauseButton.setEnabled(true);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -82,10 +96,21 @@ public class MainActivity extends AppCompatActivity {
                 if(startPlaying) {
                     playButton.setText("Stop Playing");
                     recordButton.setEnabled(false);
+                    player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            playButton.setText("Start Playing");
+                            stopPlaying();
+                            startPlaying = !startPlaying;
+                            if(readyToRecord)
+                                recordButton.setEnabled(true);
+                        }
+                    });
                 }
                 else {
                     playButton.setText("Start Playing");
-                    recordButton.setEnabled(true);
+                    if(readyToRecord)
+                        recordButton.setEnabled(true);
                 }
                 startPlaying = !startPlaying;
             }
@@ -94,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                recordingNameField.setEnabled(false);
                 onRecord(startRecording);
                 if(startRecording) {
                     recordButton.setText("Stop Recording");
@@ -105,11 +131,14 @@ public class MainActivity extends AppCompatActivity {
                     recordingNameField.setEnabled(true);
                     //SAVE FILE, ADD TO LIST
                     recordings.add(new recording(mFileName, userInput));
-                    adapter.notifyDataSetChanged();
+                    //adapter.notifyDataSetChanged();
+                    refreshContents();
                     recordingNameField.getText().clear();
+                    readyToRecord = false;
                     recordButton.setEnabled(false);
                     mFileName = null;
                 }
+                recordingNameField.setEnabled(true);
                 startRecording = !startRecording;
             }
         });
@@ -130,15 +159,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 userInput = recordingNameField.getText().toString();
-                mFileName = getExternalCacheDir().getAbsolutePath() + '/' + userInput + ".3gp";
-                Toast.makeText(MainActivity.this, mFileName, Toast.LENGTH_SHORT).show();
+                mFileName = directory.toString() + '/' + userInput + ".3gp";
+                //Toast.makeText(MainActivity.this, mFileName, Toast.LENGTH_SHORT).show();
                 file_name_entered = true;
+                readyToRecord = true;
                 recordButton.setEnabled(true);
             }
         });
 
         adapter = new recordingAdapter(this, recordings);
         listView.setAdapter(adapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -163,9 +194,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
+    }
+
     private void onpause(){
-        for(int i = 0; i < recordings.size(); i++){
-            Toast.makeText(this, recordings.get(i).getShortFileName(), Toast.LENGTH_SHORT).show();
+        for(int i = 0; i < Recordings_Contents.length; i++){
+            Toast.makeText(this, Recordings_Contents[i].toString(), Toast.LENGTH_SHORT).show();
         }
     }
     private void onRecord(boolean start){
@@ -177,11 +215,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void startRecording(){
         recorder = new MediaRecorder();
+
+        //It might be best to put this whole thing inside a try/catch
+        //block? I'm not sure.
+
         //Sets up the recorder for audio as opposed to video,
         //and a few other things related to file format and encoding.
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+
+        //I think here is where I need to add the internal storage
+        //directory as an argument
         recorder.setOutputFile(mFileName);
+
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         //Does some final magic to get the recorder ready.
         try {
@@ -194,11 +240,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopRecording(){
+        refreshContents();
         recorder.stop();
         recorder.release();
         recorder = null;
     }
 
+    protected static void refreshContents(){
+        Recordings_Contents = directory.listFiles();
+        adapter.notifyDataSetChanged();
+    }
     private void onPlay(boolean start){
         if(start)
             startPlaying();
@@ -227,5 +278,7 @@ public class MainActivity extends AppCompatActivity {
         player.release();
         player = null;
     }
+
+
 
 }
