@@ -25,9 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-//TODO: 1. Have play button change when file is over
+//TODO: 1. Check user input before file creation to see if name is already in use.
 //      2. Deload resources when playback ends
-//      3. Figure out how to create some file permanency
 //      4. Decide how to handle multiple files with the same name(Overwrite? Not Allow?)
 
 public class MainActivity extends AppCompatActivity {
@@ -36,14 +35,15 @@ public class MainActivity extends AppCompatActivity {
     protected boolean permissionToRecordAccepted = false;
     protected String [] permissions = {android.Manifest.permission.RECORD_AUDIO};
     protected ArrayList<recording> recordings = new ArrayList<recording>();
-    recordingAdapter adapter = null;
+    protected static recordingAdapter adapter = null;
 
     //3-28-18
-    File directory = null;
-    File Recordings_Contents[] = null;
+    protected static File directory = null;
+    protected static File Recordings_Contents[] = null;
 
     public String mFileName = null;
     public String userInput = null;
+    boolean readyToRecord = false;
     boolean startPlaying = true;
     boolean startRecording = true;
     boolean paused = true;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         //CREATE BLOCK THAT LOOKS FOR PRECREATED FILES AND SETS PLAY ENABLED IF THERE ARE SOME
         for(int i = 0; i < Recordings_Contents.length; i++){
-            recordings.add(new recording(Recordings_Contents[i].toString(), Recordings_Contents[i].toString()));
+            recordings.add(new recording(Recordings_Contents[i].toString()));
         }
        final EditText recordingNameField = (EditText)findViewById(R.id.recordingNameField);
         pauseButton.setEnabled(true);
@@ -96,10 +96,21 @@ public class MainActivity extends AppCompatActivity {
                 if(startPlaying) {
                     playButton.setText("Stop Playing");
                     recordButton.setEnabled(false);
+                    player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            playButton.setText("Start Playing");
+                            stopPlaying();
+                            startPlaying = !startPlaying;
+                            if(readyToRecord)
+                                recordButton.setEnabled(true);
+                        }
+                    });
                 }
                 else {
                     playButton.setText("Start Playing");
-                    recordButton.setEnabled(true);
+                    if(readyToRecord)
+                        recordButton.setEnabled(true);
                 }
                 startPlaying = !startPlaying;
             }
@@ -108,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                recordingNameField.setEnabled(false);
                 onRecord(startRecording);
                 if(startRecording) {
                     recordButton.setText("Stop Recording");
@@ -119,11 +131,14 @@ public class MainActivity extends AppCompatActivity {
                     recordingNameField.setEnabled(true);
                     //SAVE FILE, ADD TO LIST
                     recordings.add(new recording(mFileName, userInput));
-                    adapter.notifyDataSetChanged();
+                    //adapter.notifyDataSetChanged();
+                    refreshContents();
                     recordingNameField.getText().clear();
+                    readyToRecord = false;
                     recordButton.setEnabled(false);
                     mFileName = null;
                 }
+                recordingNameField.setEnabled(true);
                 startRecording = !startRecording;
             }
         });
@@ -147,12 +162,14 @@ public class MainActivity extends AppCompatActivity {
                 mFileName = directory.toString() + '/' + userInput + ".3gp";
                 //Toast.makeText(MainActivity.this, mFileName, Toast.LENGTH_SHORT).show();
                 file_name_entered = true;
+                readyToRecord = true;
                 recordButton.setEnabled(true);
             }
         });
 
         adapter = new recordingAdapter(this, recordings);
         listView.setAdapter(adapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -223,12 +240,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopRecording(){
-        Recordings_Contents = directory.listFiles();
+        refreshContents();
         recorder.stop();
         recorder.release();
         recorder = null;
     }
 
+    protected static void refreshContents(){
+        Recordings_Contents = directory.listFiles();
+        adapter.notifyDataSetChanged();
+    }
     private void onPlay(boolean start){
         if(start)
             startPlaying();
@@ -257,5 +278,7 @@ public class MainActivity extends AppCompatActivity {
         player.release();
         player = null;
     }
+
+
 
 }
