@@ -4,6 +4,14 @@ package com.example.android.improvedaudiorecorder.model;
  * Created by lizzi on 3/24/2018.
  */
 
+//There will be two/three sources of data for creating recording objects:
+//    1. The directory of audio files
+//    2. The data base with all the attributes that are associated with
+//       that specific file
+//    3. A directory of photo files for the pictures attached to each interveiw
+//       or maybe we draw from the gallery? I haven't looked into the details of
+//       the photo stuff at all
+
 public class recording {
     private String full_file_name;
     private String recording_title;
@@ -13,6 +21,7 @@ public class recording {
     -date
     -length
     -tags
+    -Photo, probably as a file path?
      */
 
 
