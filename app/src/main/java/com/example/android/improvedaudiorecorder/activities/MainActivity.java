@@ -1,4 +1,4 @@
-package com.example.android.improvedaudiorecorder;
+package com.example.android.improvedaudiorecorder.activities;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -19,7 +19,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.improvedaudiorecorder.R;
 import com.example.android.improvedaudiorecorder.model.recording;
+import com.example.android.improvedaudiorecorder.recordingAdapter;
 
 import java.io.File;
 import java.io.IOException;

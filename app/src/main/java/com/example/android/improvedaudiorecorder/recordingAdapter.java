@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.improvedaudiorecorder.activities.MainActivity;
 import com.example.android.improvedaudiorecorder.model.recording;
 
 import java.io.File;
