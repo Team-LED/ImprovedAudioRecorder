@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ImprovedAudioRecorder</string>
+    <string name="app_name">Interview Recorder</string>
     <string name="string_title">Title</string>
     <string name="string_interviewee">Interviewee</string>
     <string name="string_date">Date</string>
@@ -12,4 +12,5 @@
     <string name="string_stop_recording">Stop Recording</string>
     <string name="string_new">New</string>
     <string name="string_skip">Skip</string>
+    <string name="title_activity_detail_edit">DetailEditActivity</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.android.improvedaudiorecorder.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.improvedaudiorecorder.R;
+import com.example.android.improvedaudiorecorder.data.RecordingDbHelper;
 import com.example.android.improvedaudiorecorder.model.recording;
 import com.example.android.improvedaudiorecorder.recordingAdapter;
 
@@ -39,9 +41,12 @@ public class MainActivity extends AppCompatActivity {
     protected ArrayList<recording> listOfRecordings = new ArrayList<recording>();
     protected static recordingAdapter adapter = null;
 
-
+    //For accessing and storing audio files
     public static File directory = null;
     public static File Recordings_Contents[] = null;
+
+    //For accessing the database
+    private RecordingDbHelper dbHelper;
 
     public String mFileName = null;
     public String userInput = null;
@@ -82,10 +87,10 @@ public class MainActivity extends AppCompatActivity {
         Recordings_Contents = directory.listFiles();
 
         //Link up buttons from activity_main.xml
-        final AppCompatButton playButton = (AppCompatButton) findViewById(R.id.xml_play_button);
-        final AppCompatButton recordButton = (AppCompatButton) findViewById(R.id.xml_record_button);
-        final AppCompatButton newButton = (AppCompatButton) findViewById(R.id.xml_new_button);
-        final Button enterButton = findViewById(R.id.xml_enter_button);
+        final AppCompatButton play_button = (AppCompatButton) findViewById(R.id.xml_play_button);
+        final AppCompatButton record_button = (AppCompatButton) findViewById(R.id.xml_record_button);
+        final AppCompatButton new_button = (AppCompatButton) findViewById(R.id.xml_new_button);
+        final Button enter_button = findViewById(R.id.xml_enter_button);
         final ListView listView = findViewById(R.id.recording_container);
 
         //PRE-DATABASE IMPLEMENTATION
@@ -95,63 +100,64 @@ public class MainActivity extends AppCompatActivity {
             listOfRecordings.add(new recording(Recordings_Contents[i].toString()));
         }
 
-        final EditText recordingNameField = (EditText) findViewById(R.id.recordingNameField);
-        newButton.setEnabled(true);
+        final EditText recording_name_field = (EditText) findViewById(R.id.recordingNameField);
+
+        new_button.setEnabled(true);
 
         //Set listeners for buttons.
-        playButton.setOnClickListener(new View.OnClickListener() {
+        play_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onPlay(startPlaying);
                 if (startPlaying) {
-                    playButton.setText("Stop Playing");
-                    recordButton.setEnabled(false);
+                    play_button.setText("Stop Playing");
+                    record_button.setEnabled(false);
                     player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mp) {
-                            playButton.setText("Start Playing");
+                            play_button.setText("Start Playing");
                             stopPlaying();
                             startPlaying = !startPlaying;
                             if (readyToRecord)
-                                recordButton.setEnabled(true);
+                                record_button.setEnabled(true);
                         }
                     });
                 } else {
-                    playButton.setText("Start Playing");
+                    play_button.setText("Start Playing");
                     if (readyToRecord)
-                        recordButton.setEnabled(true);
+                        record_button.setEnabled(true);
                 }
                 startPlaying = !startPlaying;
             }
         });
 
-        recordButton.setOnClickListener(new View.OnClickListener() {
+        record_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recordingNameField.setEnabled(false);
+
                 onRecord(startRecording);
                 if (startRecording) {
-                    recordButton.setText("Stop Recording");
-                    playButton.setEnabled(false);
-                    recordingNameField.setEnabled(false);
+                    record_button.setText("Stop Recording");
+                    play_button.setEnabled(false);
+                    recording_name_field.setEnabled(false);
                 } else {
-                    recordButton.setText("Start Recording");
-                    recordingNameField.setEnabled(true);
+                    record_button.setText("Start Recording");
+                    recording_name_field.setEnabled(true);
                     //SAVE FILE, ADD TO LIST
                     listOfRecordings.add(new recording(mFileName, userInput));
                     //adapter.notifyDataSetChanged();
                     refreshContents();
-                    recordingNameField.getText().clear();
+                    recording_name_field.getText().clear();
+                    recording_name_field.setEnabled(true);
                     readyToRecord = false;
-                    recordButton.setEnabled(false);
+                    record_button.setEnabled(false);
                     mFileName = null;
                 }
-                recordingNameField.setEnabled(true);
                 startRecording = !startRecording;
             }
         });
 
-        newButton.setOnClickListener(new View.OnClickListener() {
+        new_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, DetailEntryActivity.class);
@@ -159,18 +165,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        enterButton.setOnClickListener(new View.OnClickListener() {
+        enter_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userInput = recordingNameField.getText().toString();
+                userInput = recording_name_field.getText().toString();
                 mFileName = directory.toString() + '/' + userInput + ".3gp";
-                //Toast.makeText(MainActivity.this, mFileName, Toast.LENGTH_SHORT).show();
                 file_name_entered = true;
                 readyToRecord = true;
-                recordButton.setEnabled(true);
+                record_button.setEnabled(true);
             }
         });
 
+        //Database access
+        /*
+        dbHelper = new RecordingDbHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        */
+
+        //PREDATABASE IMPLAMENTATION
         adapter = new recordingAdapter(this, listOfRecordings);
         listView.setAdapter(adapter);
 
@@ -192,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 mFileName = listItem.getFullFileName();
-                playButton.setEnabled(true);
+                play_button.setEnabled(true);
             }
         });
 
@@ -202,18 +214,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         //Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
-    }
-
-    private void onNew() {
-        //Switch intent to activity_detail_entry
-        //get details
-        //come back
-    }
-
-    private void onpause() {
-        for (int i = 0; i < Recordings_Contents.length; i++) {
-            Toast.makeText(this, Recordings_Contents[i].toString(), Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void onRecord(boolean start) {

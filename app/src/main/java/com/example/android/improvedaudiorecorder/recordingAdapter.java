@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.improvedaudiorecorder.activities.MainActivity;
 import com.example.android.improvedaudiorecorder.model.recording;
@@ -41,7 +42,16 @@ public class recordingAdapter extends ArrayAdapter<recording> {
         TextView fileNameTextView = listItemView.findViewById(R.id.item_name);
         fileNameTextView.setText(currentRecording.getRecordingTitle());
 
-        TextView deleteTextView = listItemView.findViewById(R.id.delete_view);
+        TextView detailsTextView = listItemView.findViewById(R.id.xml_details_view);
+        detailsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Switch to the detail view activity with details drawn from the recording object
+                Toast.makeText(getContext(), "Hi", Toast.LENGTH_SHORT);
+            }
+        });
+
+        TextView deleteTextView = listItemView.findViewById(R.id.xml_delete_view);
         deleteTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
