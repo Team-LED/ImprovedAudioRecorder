@@ -11,7 +11,7 @@ import com.example.android.improvedaudiorecorder.data.RecordingContract.Recordin
 
 public class RecordingDbHelper extends SQLiteOpenHelper{
 
-    private static final String DATABASE_NAME = "recordings.db";
+    private static final String DATABASE_NAME = "listOfRecordings.db";
     private static final int DATABASE_VERSION = 1;
 
     public RecordingDbHelper(Context context){
@@ -23,7 +23,9 @@ public class RecordingDbHelper extends SQLiteOpenHelper{
         String SQL_CREATE_RECORDINGS_TABLE = "CREATE TABLE " + RecordingEntry.TABLE_NAME
                 + " (" + RecordingEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + RecordingEntry.COLUMN_RECORDING_FILE_NAME + " TEXT NOT NULL, "
-                + RecordingEntry.COLUMN_RECORDING_TITLE + " TEXT DEFAULT title);";
+                + RecordingEntry.COLUMN_RECORDING_TITLE + " TEXT DEFAULT title, "
+                + RecordingEntry.COLUMN_RECORDING_INTERVIEWEE + "TEXT DEFAULT interviewee, "
+                + RecordingEntry.COLUMN_RECORDING_DATE + "TEXT DEFAULT 0.0.0);";
 
         db.execSQL(SQL_CREATE_RECORDINGS_TABLE);
     }

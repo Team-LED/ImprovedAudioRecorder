@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">ImprovedAudioRecorder</string>
+    <string name="string_title">Title</string>
+    <string name="string_interviewee">Interviewee</string>
+    <string name="string_date">Date</string>
+    <string name="string_enter">Enter</string>
+    <string name="string_cancel">Cancel</string>
+    <string name="string_pause">Pause</string>
+    <string name="string_start_playback">Start Playback</string>
+    <string name="string_start_recording">Start Recording</string>
+    <string name="string_stop_playback">Stop Playback</string>
+    <string name="string_stop_recording">Stop Recording</string>
+    <string name="string_new">New</string>
+    <string name="string_skip">Skip</string>
 </resources>

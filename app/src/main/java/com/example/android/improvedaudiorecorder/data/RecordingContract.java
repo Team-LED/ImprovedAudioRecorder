@@ -16,10 +16,9 @@ public final class RecordingContract {
         public final static String _ID = BaseColumns._ID;
         public final static String COLUMN_RECORDING_TITLE = "title";
         public final static String COLUMN_RECORDING_FILE_NAME = "filename";
-
-        /*
         public final static String COLUMN_RECORDING_INTERVIEWEE = "interviewee";
         public final static String COLUMN_RECORDING_DATE = "date";
+        /*
         public final static String COLUMN_RECORDING_TAGS = "tags";
         public final static String COLUMN_RECORDING_PHOTO = "photo";
         public final static String COLUMN_RECORDING_LENGTH = "length";

@@ -1,6 +1,6 @@
 package com.example.android.improvedaudiorecorder.activities;
 
-import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -35,16 +35,19 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "ImprovedAudioRecorder";
     protected static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     protected boolean permissionToRecordAccepted = false;
-    protected String [] permissions = {android.Manifest.permission.RECORD_AUDIO};
-    protected ArrayList<recording> recordings = new ArrayList<recording>();
+    protected String[] permissions = {android.Manifest.permission.RECORD_AUDIO};
+    protected ArrayList<recording> listOfRecordings = new ArrayList<recording>();
     protected static recordingAdapter adapter = null;
 
-    //3-28-18
-    protected static File directory = null;
-    protected static File Recordings_Contents[] = null;
+
+    public static File directory = null;
+    public static File Recordings_Contents[] = null;
 
     public String mFileName = null;
     public String userInput = null;
+
+    //States to keep track of which buttons should be enabled, to prevent
+    //stuff like playing and recording at the same time.
     boolean readyToRecord = false;
     boolean startPlaying = true;
     boolean startRecording = true;
@@ -54,48 +57,53 @@ public class MainActivity extends AppCompatActivity {
     private MediaRecorder recorder = null;
     private MediaPlayer player = null;
 
-
+    //Gets permission to use microphone
+    //Will add in camera and writing to external memory after integration
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
+        switch (requestCode) {
             case REQUEST_RECORD_AUDIO_PERMISSION:
                 permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
-        if(!permissionToRecordAccepted)
+        if (!permissionToRecordAccepted)
             finish();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityCompat.requestPermissions(this, permissions,REQUEST_RECORD_AUDIO_PERMISSION);
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
         setContentView(R.layout.activity_main);
 
-        //3-28-18
-        //switch to MODE_PRIVATE
+        //Get the name of our directory and load all the files currently stored in it
         directory = this.getDir("Recordings", MODE_PRIVATE);
         Recordings_Contents = directory.listFiles();
-        //Toast.makeText(this, directory.toString(), Toast.LENGTH_SHORT).show();
 
-        final AppCompatButton playButton = (AppCompatButton)findViewById(R.id.xml_play_button);
+        //Link up buttons from activity_main.xml
+        final AppCompatButton playButton = (AppCompatButton) findViewById(R.id.xml_play_button);
         final AppCompatButton recordButton = (AppCompatButton) findViewById(R.id.xml_record_button);
-        final AppCompatButton pauseButton = (AppCompatButton) findViewById(R.id.xml_pause_button);
-        final Button enterButton = findViewById(R.id.enter_button);
+        final AppCompatButton newButton = (AppCompatButton) findViewById(R.id.xml_new_button);
+        final Button enterButton = findViewById(R.id.xml_enter_button);
         final ListView listView = findViewById(R.id.recording_container);
 
-        //CREATE BLOCK THAT LOOKS FOR PRECREATED FILES AND SETS PLAY ENABLED IF THERE ARE SOME
-        for(int i = 0; i < Recordings_Contents.length; i++){
-            recordings.add(new recording(Recordings_Contents[i].toString()));
+        //PRE-DATABASE IMPLEMENTATION
+        //From audio files, create recording objects and load into arraylist, which will
+        //then be shown in the listview.
+        for (int i = 0; i < Recordings_Contents.length; i++) {
+            listOfRecordings.add(new recording(Recordings_Contents[i].toString()));
         }
-       final EditText recordingNameField = (EditText)findViewById(R.id.recordingNameField);
-        pauseButton.setEnabled(true);
+
+        final EditText recordingNameField = (EditText) findViewById(R.id.recordingNameField);
+        newButton.setEnabled(true);
+
+        //Set listeners for buttons.
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onPlay(startPlaying);
-                if(startPlaying) {
+                if (startPlaying) {
                     playButton.setText("Stop Playing");
                     recordButton.setEnabled(false);
                     player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -104,14 +112,13 @@ public class MainActivity extends AppCompatActivity {
                             playButton.setText("Start Playing");
                             stopPlaying();
                             startPlaying = !startPlaying;
-                            if(readyToRecord)
+                            if (readyToRecord)
                                 recordButton.setEnabled(true);
                         }
                     });
-                }
-                else {
+                } else {
                     playButton.setText("Start Playing");
-                    if(readyToRecord)
+                    if (readyToRecord)
                         recordButton.setEnabled(true);
                 }
                 startPlaying = !startPlaying;
@@ -123,16 +130,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 recordingNameField.setEnabled(false);
                 onRecord(startRecording);
-                if(startRecording) {
+                if (startRecording) {
                     recordButton.setText("Stop Recording");
                     playButton.setEnabled(false);
                     recordingNameField.setEnabled(false);
-                }
-                else {
+                } else {
                     recordButton.setText("Start Recording");
                     recordingNameField.setEnabled(true);
                     //SAVE FILE, ADD TO LIST
-                    recordings.add(new recording(mFileName, userInput));
+                    listOfRecordings.add(new recording(mFileName, userInput));
                     //adapter.notifyDataSetChanged();
                     refreshContents();
                     recordingNameField.getText().clear();
@@ -145,15 +151,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        pauseButton.setOnClickListener(new View.OnClickListener() {
+        newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onpause();
-                if(paused)
-                    pauseButton.setText("Paused");
-                else
-                    pauseButton.setText("Pause");
-                paused = !paused;
+                Intent i = new Intent(MainActivity.this, DetailEntryActivity.class);
+                startActivity(i);
             }
         });
 
@@ -169,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        adapter = new recordingAdapter(this, recordings);
+        adapter = new recordingAdapter(this, listOfRecordings);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -179,13 +181,12 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < listView.getChildCount(); i++) {
                     if (position == i) {
                         View temp = listView.getChildAt(i);
-                        TextView txtView = ((TextView)temp.findViewById(R.id.item_name));
+                        TextView txtView = ((TextView) temp.findViewById(R.id.item_name));
                         txtView.setTextColor(getResources().getColor(R.color.colorAccent));
 
-                    }
-                    else{
+                    } else {
                         View temp = listView.getChildAt(i);
-                        TextView txtView = ((TextView)temp.findViewById(R.id.item_name));
+                        TextView txtView = ((TextView) temp.findViewById(R.id.item_name));
                         txtView.setTextColor(Color.BLACK);
                     }
 
@@ -203,19 +204,26 @@ public class MainActivity extends AppCompatActivity {
         //Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
     }
 
-    private void onpause(){
-        for(int i = 0; i < Recordings_Contents.length; i++){
+    private void onNew() {
+        //Switch intent to activity_detail_entry
+        //get details
+        //come back
+    }
+
+    private void onpause() {
+        for (int i = 0; i < Recordings_Contents.length; i++) {
             Toast.makeText(this, Recordings_Contents[i].toString(), Toast.LENGTH_SHORT).show();
         }
     }
-    private void onRecord(boolean start){
-        if(start)
+
+    private void onRecord(boolean start) {
+        if (start)
             startRecording();
         else
             stopRecording();
     }
 
-    private void startRecording(){
+    private void startRecording() {
         recorder = new MediaRecorder();
 
         //It might be best to put this whole thing inside a try/catch
@@ -241,19 +249,20 @@ public class MainActivity extends AppCompatActivity {
         recorder.start();
     }
 
-    private void stopRecording(){
+    private void stopRecording() {
         refreshContents();
         recorder.stop();
         recorder.release();
         recorder = null;
     }
 
-    protected static void refreshContents(){
+    public static void refreshContents() {
         Recordings_Contents = directory.listFiles();
         adapter.notifyDataSetChanged();
     }
-    private void onPlay(boolean start){
-        if(start)
+
+    private void onPlay(boolean start) {
+        if (start)
             startPlaying();
         else
             stopPlaying();
@@ -261,14 +270,13 @@ public class MainActivity extends AppCompatActivity {
 
     //Connect a fresh MediaPlayer to our player and load it
     //with the correct file, then play it
-    private void startPlaying(){
+    private void startPlaying() {
         player = new MediaPlayer();
-        try{
+        try {
             player.setDataSource(mFileName);
             player.prepare();
             player.start();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             Log.e(LOG_TAG, "Couldn't load media file: " + mFileName);
         }
     }
@@ -276,11 +284,10 @@ public class MainActivity extends AppCompatActivity {
     //TODO: add a pause button for playback
 
     //Release resources when finished to get memory back
-    private void stopPlaying(){
+    private void stopPlaying() {
         player.release();
         player = null;
     }
-
 
 
 }

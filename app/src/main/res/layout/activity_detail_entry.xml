@@ -1,104 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools = "http://schemas.android.com/tools"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp"
     tools:context=".activities.DetailEntryActivity">
 
+    <!--Title-->
     <LinearLayout
+        android:id="@+id/container_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <!-- Label -->
         <TextView
-            android:text="Overview"
-            style="@style/CategoryStyle" />
+            style="@style/CategoryStyle"
+            android:text="@string/string_title" />
 
-        <!-- Input fields -->
-        <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:paddingLeft="4dp"
-            android:orientation="vertical">
+        <!-- Name field -->
+        <EditText
+            android:id="@+id/edit_title"
+            style="@style/EditorFieldStyle"
+            android:hint="@string/string_title"
+            android:inputType="textCapWords" />
 
-            <!-- Name field -->
-            <EditText
-                android:id="@+id/edit_pet_name"
-                android:hint="Weight"
-                android:inputType="textCapWords"
-                style="@style/EditorFieldStyle" />
-
-            <!-- Breed field -->
-            <EditText
-                android:id="@+id/edit_pet_breed"
-                android:hint="breed"
-                android:inputType="textCapWords"
-                style="@style/EditorFieldStyle" />
     </LinearLayout>
+
+    <!--Interviewee-->
+    <LinearLayout
+        android:id="@+id/container_interviewee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/string_interviewee" />
+
+        <!-- Name field -->
+        <EditText
+            android:id="@+id/edit_interviewee"
+            style="@style/EditorFieldStyle"
+            android:hint="@string/string_interviewee"
+            android:inputType="textCapWords" />
+
+    </LinearLayout>
+
+    <!--Date-->
+    <LinearLayout
+        android:id="@+id/container_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/string_date" />
+
+        <EditText
+            android:id="@+id/edit_date"
+            style="@style/EditorFieldStyle"
+            android:hint="@string/string_date"
+            android:inputType="textCapWords" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/xml_skip_details_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/xml_enter_details_button"
+            android:enabled="true"
+            android:text="@string/string_skip"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/xml_enter_details_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight ="true"
+            android:layout_alignParentEnd="true"
+            android:enabled="true"
+            android:text="@string/string_enter"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
+    </RelativeLayout>
+
 </LinearLayout>
-    <!-- Gender category -->
-    <LinearLayout
-        android:id="@+id/container_gender"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
-        <!-- Label -->
-        <TextView
-            android:text="gender"
-            style="@style/CategoryStyle" />
-
-        <!-- Input field -->
-        <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:orientation="vertical">
-
-            <!-- Gender drop-down spinner -->
-            <Spinner
-                android:id="@+id/spinner_gender"
-                android:layout_height="48dp"
-                android:layout_width="wrap_content"
-                android:paddingRight="16dp"
-                android:spinnerMode="dropdown"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Measurement category -->
-    <LinearLayout
-        android:id="@+id/container_measurement"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <!-- Label -->
-        <TextView
-            android:text="measurement"
-            style="@style/CategoryStyle" />
-
-        <!-- Input fields -->
-        <RelativeLayout
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:paddingLeft="4dp">
-
-            <!-- Weight field -->
-            <EditText
-                android:id="@+id/edit_pet_weight"
-                android:hint="weight"
-                android:inputType="number"
-                style="@style/EditorFieldStyle" />
-
-            <!-- Units for weight (kg) -->
-            <TextView
-                android:id="@+id/label_weight_units"
-                android:text="kg"
-                style="@style/EditorUnitsStyle"/>
-        </RelativeLayout>
-    </LinearLayout>
-</LinearLayout>

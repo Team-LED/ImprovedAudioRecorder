@@ -21,21 +21,20 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:layout_alignParentTop="true"
-            android:layout_alignBottom="@id/enter_button"
+            android:layout_alignBottom="@id/xml_enter_button"
             android:layout_marginRight="8dp"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
             android:hint="Recording Name" />
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/enter_button"
+            android:id="@+id/xml_enter_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/recordingNameField"
             android:layout_marginLeft="8dp"
             android:text="Enter"
             android:layout_alignParentRight="true"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
-            android:onClick="createFileName"/>
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
 
     </RelativeLayout>
 
@@ -54,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:text="Start Recording"
+            android:text="@string/string_start_recording"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
             android:enabled="false"/>
 
@@ -65,18 +64,18 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_toRightOf="@id/xml_record_button"
-            android:text="Start Playback"
+            android:text="@string/string_start_playback"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
             android:enabled="false"/>
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/xml_pause_button"
+            android:id="@+id/xml_new_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_toRightOf="@id/xml_play_button"
-            android:text="Pause"
+            android:text="@string/string_new"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
             android:enabled="false"/>
 
